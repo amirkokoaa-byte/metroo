@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import RouteDetails from './pages/RouteDetails';
 import Subscriptions from './pages/Subscriptions';
@@ -8,7 +8,7 @@ import MetroLines from './pages/MetroLines';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/route" element={<RouteDetails />} />
@@ -17,6 +17,6 @@ export default function App() {
         <Route path="/guide" element={<GuideMe />} />
         <Route path="/lines" element={<MetroLines />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
