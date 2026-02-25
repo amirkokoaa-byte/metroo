@@ -4,6 +4,7 @@ import RouteDetails from './pages/RouteDetails';
 import Subscriptions from './pages/Subscriptions';
 import Calculator from './pages/Calculator';
 import GuideMe from './pages/GuideMe';
+import MetroLines from './pages/MetroLines';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/subscriptions" element={<Subscriptions />} />
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/guide" element={<GuideMe />} />
+        <Route path="/lines" element={<MetroLines />} />
       </Routes>
     </BrowserRouter>
   );

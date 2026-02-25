@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Train, Bus, TramFront, ArrowLeftRight } from 'lucide-react';
-import { metroStations } from '../data/mockData';
+import { Search, MapPin, Train, Bus, ArrowLeftRight } from 'lucide-react';
+import { allStations } from '../data/mockData';
 
 export default function Home() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'metro' | 'train' | 'bus' | 'capital'>('metro');
   const [fromStation, setFromStation] = useState('');
   const [toStation, setToStation] = useState('');
+
+  // Filter stations for the dropdown (Metro only for simplicity in the main search, or all)
+  const metroStations = allStations.filter(s => ['1', '2', '3', '4'].includes(s.line));
 
   const handleSearch = () => {
     if (fromStation && toStation) {
@@ -55,7 +58,7 @@ export default function Home() {
             className={`flex flex-col items-center p-3 rounded-xl transition-colors ${activeTab === 'capital' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'}`}
           >
             <Train className="w-6 h-6 mb-1" />
-            <span className="text-xs font-medium">قطار العاصمة</span>
+            <span className="text-xs font-medium">القطار الكهربائي</span>
           </button>
           <button 
             onClick={() => setActiveTab('train')}
@@ -137,7 +140,10 @@ export default function Home() {
             >
               <span className="font-bold text-gray-700">اشتراكات المترو</span>
             </button>
-            <button className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl hover:bg-gray-50">
+            <button 
+              onClick={() => navigate('/lines')}
+              className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl hover:bg-gray-50"
+            >
               <span className="font-bold text-gray-700">خطوط المترو</span>
             </button>
             <button 

@@ -2,7 +2,9 @@
 export interface Station {
   id: string;
   name: string;
-  line: number;
+  line: string; // Changed to string to support 'Monorail', 'LRT', etc.
+  lineName: string;
+  order: number;
 }
 
 export interface SubscriptionPlan {
@@ -10,168 +12,135 @@ export interface SubscriptionPlan {
   title: string;
   price: string;
   details: string;
-  category: 'public' | 'elderly' | 'student' | 'capital_train';
+  category: 'public' | 'elderly' | 'student' | 'special';
   period: 'monthly' | 'quarterly' | 'yearly';
+  mode: 'metro' | 'lrt' | 'monorail' | 'train';
 }
 
-export const metroStations: Station[] = [
-  { id: '1', name: 'حلوان', line: 1 },
-  { id: '2', name: 'المعصرة', line: 1 },
-  { id: '3', name: 'طرة البلد', line: 1 },
-  { id: '4', name: 'ثكنات المعادي', line: 1 },
-  { id: '5', name: 'المعادي', line: 1 },
-  { id: '6', name: 'حدائق المعادي', line: 1 },
-  { id: '7', name: 'دار السلام', line: 1 },
-  { id: '8', name: 'الزهراء', line: 1 },
-  { id: '9', name: 'مارجرجس', line: 1 },
-  { id: '10', name: 'الملك الصالح', line: 1 },
-  { id: '11', name: 'السيدة زينب', line: 1 },
-  { id: '12', name: 'سعد زغلول', line: 1 },
-  { id: '13', name: 'السادات', line: 1 }, // Transfer 1-2
-  { id: '14', name: 'جمال عبد الناصر', line: 1 }, // Transfer 1-3
-  { id: '15', name: 'عرابي', line: 1 },
-  { id: '16', name: 'الشهداء', line: 1 }, // Transfer 1-2
-  { id: '17', name: 'غمرة', line: 1 },
-  { id: '18', name: 'الدمرداش', line: 1 },
-  { id: '19', name: 'منشية الصدر', line: 1 },
-  { id: '20', name: 'كوبري القبة', line: 1 },
-  { id: '21', name: 'حمامات القبة', line: 1 },
-  { id: '22', name: 'سراي القبة', line: 1 },
-  { id: '23', name: 'حدائق الزيتون', line: 1 },
-  { id: '24', name: 'حلمية الزيتون', line: 1 },
-  { id: '25', name: 'المطرية', line: 1 },
-  { id: '26', name: 'عين شمس', line: 1 },
-  { id: '27', name: 'عزبة النخل', line: 1 },
-  { id: '28', name: 'المرج', line: 1 },
-  { id: '29', name: 'المرج الجديدة', line: 1 },
-  
-  // Line 2 (Partial)
-  { id: '30', name: 'شبرا الخيمة', line: 2 },
-  { id: '31', name: 'كلية الزراعة', line: 2 },
-  { id: '32', name: 'المظلات', line: 2 },
-  { id: '33', name: 'الخلفاوي', line: 2 },
-  { id: '34', name: 'سانت تريزا', line: 2 },
-  { id: '35', name: 'روض الفرج', line: 2 },
-  { id: '36', name: 'مسرة', line: 2 },
-  { id: '37', name: 'الشهداء', line: 2 }, // Transfer
-  { id: '38', name: 'العتبة', line: 2 }, // Transfer 2-3
-  { id: '39', name: 'محمد نجيب', line: 2 },
-  { id: '40', name: 'السادات', line: 2 }, // Transfer
-  { id: '41', name: 'الأوبرا', line: 2 },
-  { id: '42', name: 'الدقي', line: 2 },
-  { id: '43', name: 'البحوث', line: 2 },
-  { id: '44', name: 'جامعة القاهرة', line: 2 }, // Transfer 2-3
-  { id: '45', name: 'فيصل', line: 2 },
-  { id: '46', name: 'الجيزة', line: 2 },
-  { id: '47', name: 'ضواحي الجيزة', line: 2 },
-  { id: '48', name: 'ساقية مكي', line: 2 },
-  { id: '49', name: 'المنيب', line: 2 },
+// --- Metro Line 1 (Helwan - El Marg) ---
+const line1Stations = [
+  'حلوان', 'عين حلوان', 'جامعة حلوان', 'وادي حوف', 'حدائق حلوان', 'المعصرة', 'طرة الأسمنت', 'كوتسيكا',
+  'طرة البلد', 'ثكنات المعادي', 'المعادي', 'حدائق المعادي', 'دار السلام', 'الزهراء', 'مارجرجس', 'الملك الصالح',
+  'السيدة زينب', 'سعد زغلول', 'السادات', 'جمال عبد الناصر', 'عرابي', 'الشهداء', 'غمرة', 'الدمرداش',
+  'منشية الصدر', 'كوبري القبة', 'حمامات القبة', 'سراي القبة', 'حدائق الزيتون', 'حلمية الزيتون', 'المطرية',
+  'عين شمس', 'عزبة النخل', 'المرج', 'المرج الجديدة'
+].map((name, i) => ({ id: `m1-${i}`, name, line: '1', lineName: 'الخط الأول (حلوان - المرج)', order: i + 1 }));
 
-  // Line 3 (Partial)
-  { id: '50', name: 'عدلي منصور', line: 3 },
-  { id: '51', name: 'الهايكستب', line: 3 },
-  { id: '52', name: 'عمر بن الخطاب', line: 3 },
-  { id: '53', name: 'قباء', line: 3 },
-  { id: '54', name: 'هشام بركات', line: 3 },
-  { id: '55', name: 'النزهة', line: 3 },
-  { id: '56', name: 'نادي الشمس', line: 3 },
-  { id: '57', name: 'ألف مسكن', line: 3 },
-  { id: '58', name: 'ميدان هليوبوليس', line: 3 },
-  { id: '59', name: 'هارون', line: 3 },
-  { id: '60', name: 'الأهرام', line: 3 },
-  { id: '61', name: 'كلية البنات', line: 3 },
-  { id: '62', name: 'ستاد القاهرة', line: 3 },
-  { id: '63', name: 'أرض المعارض', line: 3 },
-  { id: '64', name: 'العباسية', line: 3 },
-  { id: '65', name: 'عبده باشا', line: 3 },
-  { id: '66', name: 'الجيش', line: 3 },
-  { id: '67', name: 'باب الشعرية', line: 3 },
-  { id: '68', name: 'العتبة', line: 3 }, // Transfer
-  { id: '69', name: 'جمال عبد الناصر', line: 3 }, // Transfer
-  { id: '70', name: 'ماسبيرو', line: 3 },
-  { id: '71', name: 'صفاء حجازي', line: 3 },
-  { id: '72', name: 'الكيت كات', line: 3 },
-  { id: '73', name: 'السودان', line: 3 },
-  { id: '74', name: 'إمبابة', line: 3 },
-  { id: '75', name: 'البوهي', line: 3 },
-  { id: '76', name: 'القومية العربية', line: 3 },
-  { id: '77', name: 'الطريق الدائري', line: 3 },
-  { id: '78', name: 'محور روض الفرج', line: 3 },
-  { id: '79', name: 'التوفيقية', line: 3 },
-  { id: '80', name: 'وادي النيل', line: 3 },
-  { id: '81', name: 'جامعة الدول', line: 3 },
-  { id: '82', name: 'بولاق الدكرور', line: 3 },
-  { id: '83', name: 'جامعة القاهرة', line: 3 }, // Transfer
+// --- Metro Line 2 (Shubra - El Mounib) ---
+const line2Stations = [
+  'المنيب', 'ساقية مكي', 'ضواحي الجيزة', 'الجيزة', 'فيصل', 'جامعة القاهرة', 'البحوث', 'الدقي', 'الأوبرا',
+  'السادات', 'محمد نجيب', 'العتبة', 'الشهداء', 'مسرة', 'روض الفرج', 'سانت تريزا', 'الخلفاوي', 'المظلات',
+  'كلية الزراعة', 'شبرا الخيمة'
+].map((name, i) => ({ id: `m2-${i}`, name, line: '2', lineName: 'الخط الثاني (شبرا - المنيب)', order: i + 1 }));
+
+// --- Metro Line 3 (Adly Mansour - Rod El Farag/Cairo Univ) ---
+const line3Stations = [
+  'عدلي منصور', 'الهايكستب', 'عمر بن الخطاب', 'قباء', 'هشام بركات', 'النزهة', 'نادي الشمس', 'ألف مسكن',
+  'ميدان هليوبوليس', 'هارون', 'الأهرام', 'كلية البنات', 'ستاد القاهرة', 'أرض المعارض', 'العباسية',
+  'عبده باشا', 'الجيش', 'باب الشعرية', 'العتبة', 'جمال عبد الناصر', 'ماسبيرو', 'صفاء حجازي', 'الكيت كات',
+  'السودان', 'إمبابة', 'البوهي', 'القومية العربية', 'الطريق الدائري', 'محور روض الفرج',
+  'التوفيقية', 'وادي النيل', 'جامعة الدول', 'بولاق الدكرور', 'جامعة القاهرة'
+].map((name, i) => ({ id: `m3-${i}`, name, line: '3', lineName: 'الخط الثالث (عدلي منصور - روض الفرج)', order: i + 1 }));
+
+// --- Metro Line 4 (Under Construction - Phase 1) ---
+const line4Stations = [
+  'حدائق الأشجار', 'حدائق الأهرام', 'النصر', 'المتحف المصري الكبير', 'ميدان الرماية', 'الأهرام',
+  'المريوطية', 'العريش', 'المطبعة', 'الطالبية', 'مدكور', 'المساحة', 'الجيزة', 'ميدان الجيزة',
+  'الروضة', 'الملك الصالح', 'الفسطاط', 'قلعة صلاح الدين', 'الملك منصور', 'الحي السادس', 'الطيران',
+  'عباس العقاد', 'مكرم عبيد', 'حسن مأمون', 'الحي العاشر', 'زهراء مدينة نصر', 'أكاديمية الشرطة', 'الياسمين'
+].map((name, i) => ({ id: `m4-${i}`, name, line: '4', lineName: 'الخط الرابع (أكتوبر - القاهرة الجديدة)', order: i + 1 }));
+
+// --- Monorail East (New Capital) ---
+const monorailEastStations = [
+  'الاستاد', 'هشام بركات', 'نوري خطاب', 'الحي السابع', 'ذاكر حسين', 'المنطقة الحرة', 'المشير طنطاوي',
+  'كايرو فيستيفال', 'الشويفات', 'المستشفى الجوي', 'النرجس', 'محمد نجيب', 'الجامعة الأمريكية', 'إعمار',
+  'النافورة', 'البروة', 'الدائري الأوسطي', 'محمد بن زايد', 'الدائري الإقليمي', 'فندق الماسة',
+  'حي الوزارات', 'العاصمة الإدارية'
+].map((name, i) => ({ id: `me-${i}`, name, line: 'monorail_east', lineName: 'مونوريل شرق النيل (العاصمة الإدارية)', order: i + 1 }));
+
+// --- Monorail West (6th of October) ---
+const monorailWestStations = [
+  'وادي النيل', 'الطريق الدائري', 'المريوطية', 'المنصورية', 'الطريق الصحراوي', 'هايبر وان', 'جهينة',
+  'هيئة المجتمعات العمرانية', 'الحصري', 'دار الفؤاد', 'المنطقة الصناعية', 'القطار السريع'
+].map((name, i) => ({ id: `mw-${i}`, name, line: 'monorail_west', lineName: 'مونوريل غرب النيل (أكتوبر)', order: i + 1 }));
+
+// --- LRT (Light Rail Transit) ---
+const lrtStations = [
+  'عدلي منصور', 'العبور', 'المستقبل', 'الشروق', 'هليوبوليس الجديدة', 'بدر', 'الروبيكي',
+  'حدائق العاصمة', 'مطار العاصمة', 'مدينة الفنون والثقافة'
+].map((name, i) => ({ id: `lrt-${i}`, name, line: 'lrt', lineName: 'القطار الكهربائي الخفيف (LRT)', order: i + 1 }));
+
+// --- High Speed Train (Green Line) ---
+const highSpeedStations = [
+  'العين السخنة', 'العاصمة الإدارية', 'محمد نجيب', 'القاهرة الجديدة', 'جنوب الجيزة', 'حدائق أكتوبر',
+  '6 أكتوبر', 'سفنكس', 'السادات', 'وادي النطرون', 'النوبارية', 'الإسكندرية', 'برج العرب', 'العلمين',
+  'رأس الحكمة', 'الضبعة', 'سيدي عبد الرحمن', 'مطروح'
+].map((name, i) => ({ id: `hst-${i}`, name, line: 'hst', lineName: 'القطار الكهربائي السريع (الخط الأخضر)', order: i + 1 }));
+
+// --- BRT (Ring Road) ---
+const brtStations = [
+  'عدلي منصور', 'مطار القاهرة', 'أكاديمية الشرطة', 'السويس', 'التجمع', 'طريق العين السخنة', 'كارفور المعادي',
+  'البساتين', 'أثر النبي', 'المنيب', 'المريوطية', 'المنصورية', 'طريق الواحات', 'دريم لاند', 'الوراق', 'مسطرد'
+].map((name, i) => ({ id: `brt-${i}`, name, line: 'brt', lineName: 'الأتوبيس الترددي (BRT)', order: i + 1 }));
+
+
+export const allStations = [
+  ...line1Stations, ...line2Stations, ...line3Stations, ...line4Stations,
+  ...monorailEastStations, ...monorailWestStations,
+  ...lrtStations, ...highSpeedStations, ...brtStations
 ];
 
 export const subscriptions: SubscriptionPlan[] = [
-  {
-    id: '1',
-    title: 'الجمهور',
-    price: '310 جنيه',
-    details: 'اسعار تبدأ من',
-    category: 'public',
-    period: 'monthly'
-  },
-  {
-    id: '2',
-    title: 'كبار السن من 60 ل 70 سنة',
-    price: '220 جنيه',
-    details: 'اسعار تبدأ من',
-    category: 'elderly',
-    period: 'monthly'
-  },
-  {
-    id: '3',
-    title: 'قطار العاصمة 3 محطات',
-    price: '300 جنيه',
-    details: 'اشتراك شهري',
-    category: 'capital_train',
-    period: 'monthly'
-  },
-  {
-    id: '4',
-    title: 'قطار العاصمة 7 محطات',
-    price: '500 جنيه',
-    details: 'اشتراك شهري',
-    category: 'capital_train',
-    period: 'monthly'
-  },
-  {
-    id: '5',
-    title: 'قطار العاصمة لاكثر من 7 محطات',
-    price: '600 جنيه',
-    details: 'اشتراك شهري',
-    category: 'capital_train',
-    period: 'monthly'
-  },
-  {
-    id: '6',
-    title: 'الجمهور',
-    price: '310 جنيه',
-    details: 'اسعار تبدأ من',
-    category: 'public',
-    period: 'yearly'
-  },
-  {
-    id: '7',
-    title: 'كبار السن من 60 ل 70 سنة',
-    price: '220 جنيه',
-    details: 'اسعار تبدأ من',
-    category: 'elderly',
-    period: 'yearly'
-  },
+  // Metro
+  { id: 'm1', title: 'اشتراك المترو الشهري (1 منطقة)', price: '310 جنيه', details: 'عدد 60 رحلة', category: 'public', period: 'monthly', mode: 'metro' },
+  { id: 'm2', title: 'اشتراك المترو الشهري (2 منطقة)', price: '365 جنيه', details: 'عدد 60 رحلة', category: 'public', period: 'monthly', mode: 'metro' },
+  { id: 'm3', title: 'اشتراك المترو الشهري (3/4 مناطق)', price: '425 جنيه', details: 'عدد 60 رحلة', category: 'public', period: 'monthly', mode: 'metro' },
+  { id: 'm4', title: 'اشتراك المترو الربع سنوي (1 منطقة)', price: '885 جنيه', details: 'عدد 180 رحلة', category: 'public', period: 'quarterly', mode: 'metro' },
+  { id: 'm5', title: 'اشتراك المترو الربع سنوي (3/4 مناطق)', price: '1225 جنيه', details: 'عدد 180 رحلة', category: 'public', period: 'quarterly', mode: 'metro' },
+  { id: 'm6', title: 'اشتراك الطلبة الربع سنوي', price: '45 جنيه', details: 'لجميع المناطق', category: 'student', period: 'quarterly', mode: 'metro' },
+  { id: 'm7', title: 'اشتراك كبار السن (فوق 70)', price: 'مجانا', details: 'لجميع المناطق', category: 'elderly', period: 'monthly', mode: 'metro' },
+  { id: 'm8', title: 'اشتراك كبار السن (60-70) شهري', price: '220 جنيه', details: 'لجميع المناطق', category: 'elderly', period: 'monthly', mode: 'metro' },
+
+  // LRT
+  { id: 'l1', title: 'اشتراك LRT شهري (3 محطات)', price: '300 جنيه', details: 'غير محدود', category: 'public', period: 'monthly', mode: 'lrt' },
+  { id: 'l2', title: 'اشتراك LRT شهري (7 محطات)', price: '500 جنيه', details: 'غير محدود', category: 'public', period: 'monthly', mode: 'lrt' },
+  { id: 'l3', title: 'اشتراك LRT شهري (أكثر من 7)', price: '700 جنيه', details: 'غير محدود', category: 'public', period: 'monthly', mode: 'lrt' },
+
+  // Monorail (Estimated 2026)
+  { id: 'mo1', title: 'اشتراك المونوريل الشهري', price: '600 جنيه', details: 'كامل الخط', category: 'public', period: 'monthly', mode: 'monorail' },
+  { id: 'mo2', title: 'اشتراك المونوريل الطلابي', price: '200 جنيه', details: 'كامل الخط', category: 'student', period: 'monthly', mode: 'monorail' },
+
+  // Train
+  { id: 't1', title: 'اشتراك القطار المحسن (كيلومتري)', price: 'حسب المسافة', details: 'للمسافات الطويلة', category: 'public', period: 'monthly', mode: 'train' },
 ];
 
-export const calculateTicketPrice = (stations: number, type: 'public' | 'elderly' | 'special') => {
-  // 2026 Estimated Prices
-  let basePrice = 0;
-  if (stations <= 9) basePrice = 8;
-  else if (stations <= 16) basePrice = 10;
-  else if (stations <= 23) basePrice = 15;
-  else basePrice = 20;
+export const calculateTicketPrice = (stations: number, type: 'public' | 'elderly' | 'special', mode: string = 'metro') => {
+  if (mode === 'metro') {
+    let basePrice = 0;
+    if (stations <= 9) basePrice = 8;
+    else if (stations <= 16) basePrice = 10;
+    else if (stations <= 23) basePrice = 15;
+    else basePrice = 20;
 
-  if (type === 'elderly') return Math.ceil(basePrice * 0.5);
-  if (type === 'special') return 5; // Flat rate usually
-  return basePrice;
+    if (type === 'elderly') return Math.ceil(basePrice * 0.5);
+    if (type === 'special') return 5;
+    return basePrice;
+  }
+  
+  if (mode === 'lrt') {
+    if (stations <= 3) return 10;
+    if (stations <= 7) return 15;
+    return 20;
+  }
+
+  if (mode === 'monorail') {
+    // Estimated flat or zone
+    return 30; 
+  }
+
+  if (mode === 'brt') {
+    return 15; // Flat rate estimate
+  }
+
+  return 0;
 };

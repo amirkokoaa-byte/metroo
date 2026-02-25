@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Header } from '../components/Header';
-import { metroStations, calculateTicketPrice } from '../data/mockData';
-import { Minus, Plus, Ticket } from 'lucide-react';
+import { allStations, calculateTicketPrice } from '../data/mockData';
+import { Minus, Plus, Ticket, Train, Bus, Zap } from 'lucide-react';
 
 export default function Calculator() {
+  const [mode, setMode] = useState<'metro' | 'lrt' | 'monorail' | 'brt'>('metro');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   
@@ -15,6 +16,15 @@ export default function Calculator() {
 
   const [totalPrice, setTotalPrice] = useState<number | null>(null);
 
+  // Filter stations based on selected mode
+  const filteredStations = allStations.filter(s => {
+    if (mode === 'metro') return ['1', '2', '3', '4'].includes(s.line);
+    if (mode === 'lrt') return s.line === 'lrt';
+    if (mode === 'monorail') return s.line.startsWith('monorail');
+    if (mode === 'brt') return s.line === 'brt';
+    return false;
+  });
+
   const updateCount = (type: keyof typeof counts, delta: number) => {
     setCounts(prev => ({
       ...prev,
@@ -25,31 +35,54 @@ export default function Calculator() {
   const handleCalculate = () => {
     if (!from || !to) return;
     
-    // Simple logic: calculate distance based on index difference for now
-    // In a real app, we'd use a graph algorithm
-    const fromIndex = metroStations.findIndex(s => s.id === from);
-    const toIndex = metroStations.findIndex(s => s.id === to);
+    const fromIndex = filteredStations.findIndex(s => s.id === from);
+    const toIndex = filteredStations.findIndex(s => s.id === to);
     
-    // Mock distance: absolute difference + 5 (to simulate transfers/reality)
-    const stationsCount = Math.abs(fromIndex - toIndex) + 5;
+    // Mock distance logic
+    const stationsCount = Math.abs(fromIndex - toIndex) + 1;
     
-    const publicPrice = calculateTicketPrice(stationsCount, 'public') * counts.public;
-    const elderlyPrice = calculateTicketPrice(stationsCount, 'elderly') * counts.elderly;
-    const specialPrice = calculateTicketPrice(stationsCount, 'special') * counts.special;
+    const publicPrice = calculateTicketPrice(stationsCount, 'public', mode) * counts.public;
+    const elderlyPrice = calculateTicketPrice(stationsCount, 'elderly', mode) * counts.elderly;
+    const specialPrice = calculateTicketPrice(stationsCount, 'special', mode) * counts.special;
     
     setTotalPrice(publicPrice + elderlyPrice + specialPrice);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <Header title="احسب سعر التذاكر" showBack />
+      <Header title="حاسبة التذاكر" showBack />
       
       <div className="p-4">
-        {/* Illustration */}
-        <div className="flex justify-center mb-6">
-          <div className="bg-blue-100 rounded-full p-6 w-48 h-48 flex items-center justify-center">
-            <Ticket className="w-24 h-24 text-blue-600" />
-          </div>
+        {/* Mode Selector */}
+        <div className="grid grid-cols-4 gap-2 mb-6">
+          <button 
+            onClick={() => { setMode('metro'); setFrom(''); setTo(''); setTotalPrice(null); }}
+            className={`flex flex-col items-center p-2 rounded-xl transition-colors ${mode === 'metro' ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+          >
+            <Train className="w-5 h-5 mb-1" />
+            <span className="text-[10px] font-bold">المترو</span>
+          </button>
+          <button 
+            onClick={() => { setMode('lrt'); setFrom(''); setTo(''); setTotalPrice(null); }}
+            className={`flex flex-col items-center p-2 rounded-xl transition-colors ${mode === 'lrt' ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+          >
+            <Zap className="w-5 h-5 mb-1" />
+            <span className="text-[10px] font-bold">الكهربائي</span>
+          </button>
+          <button 
+            onClick={() => { setMode('monorail'); setFrom(''); setTo(''); setTotalPrice(null); }}
+            className={`flex flex-col items-center p-2 rounded-xl transition-colors ${mode === 'monorail' ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+          >
+            <Train className="w-5 h-5 mb-1" />
+            <span className="text-[10px] font-bold">المونوريل</span>
+          </button>
+          <button 
+            onClick={() => { setMode('brt'); setFrom(''); setTo(''); setTotalPrice(null); }}
+            className={`flex flex-col items-center p-2 rounded-xl transition-colors ${mode === 'brt' ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 border border-gray-200'}`}
+          >
+            <Bus className="w-5 h-5 mb-1" />
+            <span className="text-[10px] font-bold">الترددي</span>
+          </button>
         </div>
 
         {/* Station Selection */}
@@ -62,7 +95,7 @@ export default function Calculator() {
             onChange={(e) => setFrom(e.target.value)}
           >
             <option value="">محطة القيام</option>
-            {metroStations.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            {filteredStations.map(s => <option key={s.id} value={s.id}>{s.name} {s.line !== '1' && s.line !== '2' && s.line !== '3' && s.line !== '4' ? '' : `- الخط ${s.line}`}</option>)}
           </select>
 
           <select 
@@ -71,7 +104,7 @@ export default function Calculator() {
             onChange={(e) => setTo(e.target.value)}
           >
             <option value="">محطة الوصول</option>
-            {metroStations.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            {filteredStations.map(s => <option key={s.id} value={s.id}>{s.name} {s.line !== '1' && s.line !== '2' && s.line !== '3' && s.line !== '4' ? '' : `- الخط ${s.line}`}</option>)}
           </select>
         </div>
 

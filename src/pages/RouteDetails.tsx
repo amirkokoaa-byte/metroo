@@ -2,7 +2,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Clock, DollarSign, MapPin, Circle, RefreshCw, TrainFront, Ticket } from 'lucide-react';
-import { metroStations } from '../data/mockData';
+import { allStations } from '../data/mockData';
 
 export default function RouteDetails() {
   const [searchParams] = useSearchParams();
@@ -10,8 +10,8 @@ export default function RouteDetails() {
   const toId = searchParams.get('to');
   const type = searchParams.get('type') || 'metro';
 
-  const fromStation = metroStations.find(s => s.id === fromId) || metroStations[6]; // Default Dar El Salam
-  const toStation = metroStations.find(s => s.id === toId) || metroStations[80]; // Default Gamaa El Dowal
+  const fromStation = allStations.find(s => s.id === fromId) || allStations[6]; // Default Dar El Salam
+  const toStation = allStations.find(s => s.id === toId) || allStations[80]; // Default Gamaa El Dowal
 
   if (type === 'train') {
     return (
